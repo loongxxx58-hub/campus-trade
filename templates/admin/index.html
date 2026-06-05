@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h4 class="fw-bold"><i class="bi bi-speedometer2 me-2"></i>管理员后台</h4>
+    </div>
+    <div class="col text-end">
+        <a href="/admin/products" class="btn btn-outline-primary me-2">商品管理</a>
+        <a href="/admin/users" class="btn btn-outline-primary">用户管理</a>
+    </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-4 text-center" style="border-top: 4px solid #667eea;">
+            <div class="fw-bold fs-1" style="color:#667eea;">{{ total_users }}</div>
+            <div class="text-muted">注册用户</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4 text-center" style="border-top: 4px solid #f093fb;">
+            <div class="fw-bold fs-1" style="color:#f093fb;">{{ total_products }}</div>
+            <div class="text-muted">商品总数</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4 text-center" style="border-top: 4px solid #4facfe;">
+            <div class="fw-bold fs-1" style="color:#4facfe;">{{ total_messages }}</div>
+            <div class="text-muted">留言总数</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4 text-center" style="border-top: 4px solid #43e97b;">
+            <div class="fw-bold fs-1" style="color:#43e97b;">{{ total_wants }}</div>
+            <div class="text-muted">求购信息</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- 最新商品 -->
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-box me-2"></i>最新发布商品</h6>
+            <table class="table table-sm">
+                <thead><tr><th>商品名</th><th>价格</th><th>卖家</th><th>状态</th></tr></thead>
+                <tbody>
+                {% for p in recent_products %}
+                <tr>
+                    <td><a href="/product/{{ p.id }}" class="text-decoration-none">{{ p.name[:12] }}</a></td>
+                    <td class="text-danger">¥{{ p.price }}</td>
+                    <td>{{ p.seller.username }}</td>
+                    <td>
+                        {% if p.status == '在售' %}
+                        <span class="badge bg-success">在售</span>
+                        {% else %}
+                        <span class="badge bg-secondary">已售</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <a href="/admin/products" class="btn btn-outline-primary btn-sm">查看全部</a>
+        </div>
+    </div>
+
+    <!-- 最新用户 -->
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-people me-2"></i>最新注册用户</h6>
+            <table class="table table-sm">
+                <thead><tr><th>用户名</th><th>注册时间</th><th>商品数</th></tr></thead>
+                <tbody>
+                {% for u in recent_users %}
+                <tr>
+                    <td><a href="/profile/{{ u.id }}" class="text-decoration-none">{{ u.username }}</a></td>
+                    <td>{{ u.created_at.strftime('%m-%d %H:%M') }}</td>
+                    <td>{{ u.products|length }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <a href="/admin/users" class="btn btn-outline-primary btn-sm">查看全部</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

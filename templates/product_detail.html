@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-4 mb-4">
+            {% if product.image != 'default.jpg' %}
+            <img src="/static/uploads/{{ product.image }}" class="img-fluid rounded-3 mb-3" style="max-height:350px; object-fit:cover; width:100%;">
+            {% endif %}
+            <div class="d-flex justify-content-between align-items-start">
+                <span class="badge-category">{{ product.category }}</span>
+                {% if product.status == '已售出' %}
+                <span class="badge bg-secondary">已售出</span>
+                {% else %}
+                <span class="badge bg-success">在售</span>
+                {% endif %}
+            </div>
+            <h3 class="fw-bold mt-2">{{ product.name }}</h3>
+            <h3 class="text-danger fw-bold">¥{{ product.price }}</h3>
+            <hr>
+            <p class="text-muted" style="line-height:1.8;">{{ product.description }}</p>
+            <hr>
+            <div class="d-flex justify-content-between">
+                <small class="text-muted"><i class="bi bi-person me-1"></i>{{ product.seller.username }}</small>
+                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ product.created_at.strftime('%Y-%m-%d') }}</small>
+                <small class="text-muted"><i class="bi bi-eye me-1"></i>{{ product.views }} 次浏览</small>
+            </div>
+        </div>
+
+        <!-- 留言区 -->
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-chat-dots me-2"></i>留言区（{{ messages|length }}条）</h5>
+            {% if current_user.is_authenticated %}
+            <form method="POST" class="mb-4">
+                <div class="mb-2">
+                    <textarea name="content" class="form-control" rows="2" placeholder="有问题？留言咨询卖家..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-send me-1"></i>发送留言
+                </button>
+            </form>
+            {% else %}
+            <div class="alert alert-light">
+                <a href="/login" class="text-decoration-none fw-bold">登录</a> 后才能留言
+            </div>
+            {% endif %}
+
+            {% if messages %}
+                {% for msg in messages %}
+                <div class="d-flex gap-3 py-3 border-bottom">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
+                         style="width:38px; height:38px; font-size:14px;">
+                        {{ msg.author.username[0].upper() }}
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <strong style="font-size:14px;">{{ msg.author.username }}</strong>
+                            <small class="text-muted">{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <p class="mb-0" style="font-size:14px;">{{ msg.content }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted text-center py-3">暂无留言，快来抢沙发！</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 右侧卖家信息 -->
+    <div class="col-md-4">
+        <div class="card p-4 mb-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-person-circle me-2"></i>卖家信息</h6>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
+                     style="width:48px; height:48px; font-size:18px;">
+                    {{ product.seller.username[0].upper() }}
+                </div>
+                <div>
+                    <p class="fw-bold mb-0">{{ product.seller.username }}</p>
+                    <small class="text-muted">加入于 {{ product.seller.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+            <a href="/profile/{{ product.seller.id }}" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                <i class="bi bi-shop me-1"></i>查看他的主页
+            </a>
+            {% if current_user.is_authenticated and current_user.id != product.user_id %}
+            <a href="/favorite/{{ product.id }}" class="btn btn-sm w-100 {{ 'btn-danger' if is_favorited else 'btn-outline-danger' }}">
+                <i class="bi bi-heart{{ '-fill' if is_favorited else '' }} me-1"></i>
+                {{ '已收藏' if is_favorited else '收藏商品' }}
+            </a>
+            {% endif %}
+        </div>
+
+        {% if current_user.is_authenticated and current_user.id == product.user_id %}
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-gear me-2"></i>管理商品</h6>
+            {% if product.status == '在售' %}
+            <a href="/sold/{{ product.id }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                <i class="bi bi-check-circle me-1"></i>标记为已售出
+            </a>
+            {% endif %}
+            <a href="/delete_product/{{ product.id }}" class="btn btn-outline-danger btn-sm w-100"
+               onclick="return confirm('确定删除这个商品吗？')">
+                <i class="bi bi-trash me-1"></i>删除商品
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

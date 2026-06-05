@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h4 class="fw-bold"><i class="bi bi-box me-2"></i>商品管理</h4>
+    </div>
+    <div class="col text-end">
+        <a href="/admin" class="btn btn-outline-secondary">返回后台</a>
+    </div>
+</div>
+
+<div class="card p-4">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>商品名</th>
+                <th>分类</th>
+                <th>价格</th>
+                <th>卖家</th>
+                <th>状态</th>
+                <th>发布时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in products %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td><a href="/product/{{ p.id }}" class="text-decoration-none">{{ p.name[:15] }}</a></td>
+            <td><span class="badge-category">{{ p.category }}</span></td>
+            <td class="text-danger fw-bold">¥{{ p.price }}</td>
+            <td>{{ p.seller.username }}</td>
+            <td>
+                {% if p.status == '在售' %}
+                <span class="badge bg-success">在售</span>
+                {% else %}
+                <span class="badge bg-secondary">已售出</span>
+                {% endif %}
+            </td>
+            <td><small class="text-muted">{{ p.created_at.strftime('%Y-%m-%d') }}</small></td>
+            <td>
+                <a href="/admin/delete_product/{{ p.id }}"
+                   class="btn btn-outline-danger btn-sm"
+                   onclick="return confirm('确定删除此商品吗？')">
+                    <i class="bi bi-trash"></i> 删除
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

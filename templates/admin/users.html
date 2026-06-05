@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h4 class="fw-bold"><i class="bi bi-people me-2"></i>用户管理</h4>
+    </div>
+    <div class="col text-end">
+        <a href="/admin" class="btn btn-outline-secondary">返回后台</a>
+    </div>
+</div>
+
+<div class="card p-4">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>注册时间</th>
+                <th>发布商品数</th>
+                <th>留言数</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.id }}</td>
+            <td>
+                <a href="/profile/{{ u.id }}" class="text-decoration-none fw-bold">
+                    {{ u.username }}
+                </a>
+                {% if u.username == 'admin' %}
+                <span class="badge bg-danger ms-1">管理员</span>
+                {% endif %}
+            </td>
+            <td><small class="text-muted">{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+            <td>{{ u.products|length }}</td>
+            <td>{{ u.messages|length }}</td>
+            <td>
+                {% if u.username != 'admin' %}
+                <a href="/admin/delete_user/{{ u.id }}"
+                   class="btn btn-outline-danger btn-sm"
+                   onclick="return confirm('确定删除用户 {{ u.username }} 吗？此操作不可恢复！')">
+                    <i class="bi bi-trash"></i> 删除
+                </a>
+                {% else %}
+                <span class="text-muted">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

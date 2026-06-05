@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card p-4 text-center mb-4">
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold mx-auto mb-3"
+                 style="width:80px; height:80px; font-size:32px;">
+                {{ user.username[0].upper() }}
+            </div>
+            <h5 class="fw-bold mb-1">{{ user.username }}</h5>
+            <p class="text-muted mb-3"><i class="bi bi-calendar me-1"></i>加入于 {{ user.created_at.strftime('%Y-%m-%d') }}</p>
+            <div class="row text-center g-2">
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background:#ede9fe;">
+                        <div class="fw-bold fs-4" style="color:#7c3aed;">{{ products|length }}</div>
+                        <small class="text-muted">在售商品</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background:#dcfce7;">
+                        <div class="fw-bold fs-4" style="color:#16a34a;">良好</div>
+                        <small class="text-muted">信用评级</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h5 class="fw-bold mb-3"><i class="bi bi-shop me-2"></i>{{ user.username }} 的在售商品</h5>
+        {% if products %}
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            {% for product in products %}
+            <div class="col">
+                <a href="/product/{{ product.id }}" class="text-decoration-none text-dark">
+                    <div class="card h-100">
+                        {% if product.image != 'default.jpg' %}
+                        <img src="/static/uploads/{{ product.image }}" class="product-img" alt="{{ product.name }}">
+                        {% else %}
+                        <div class="product-img d-flex align-items-center justify-content-center" style="background:#ede9fe;">
+                            <span style="font-size:40px;">📦</span>
+                        </div>
+                        {% endif %}
+                        <div class="card-body p-3">
+                            <span class="badge-category">{{ product.category }}</span>
+                            <h6 class="fw-bold mt-2 mb-1">{{ product.name }}</h6>
+                            <p class="text-muted mb-1" style="font-size:13px;">{{ product.description[:40] }}...</p>
+                            <span class="fw-bold text-danger">¥{{ product.price }}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div style="font-size:60px;">📭</div>
+            <p class="text-muted mt-3">该用户暂无在售商品</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h4 class="fw-bold mb-4 text-center"><i class="bi bi-plus-circle me-2"></i>发布商品</h4>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">商品图片</label>
+                    <input type="file" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
+                    <div id="preview" class="mt-2 d-none">
+                        <img id="preview-img" src="" class="img-fluid rounded-3" style="max-height:200px;">
+                    </div>
+                    <small class="text-muted">支持 jpg、png、gif 格式，最大16MB</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">商品名称</label>
+                    <input type="text" name="name" class="form-control" placeholder="例如：九成新高数教材" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">商品分类</label>
+                    <select name="category" class="form-select" required>
+                        <option value="">请选择分类</option>
+                        <option value="教材书籍">📚 教材书籍</option>
+                        <option value="电子产品">💻 电子产品</option>
+                        <option value="生活用品">🏠 生活用品</option>
+                        <option value="运动器材">⚽ 运动器材</option>
+                        <option value="服装鞋帽">👕 服装鞋帽</option>
+                        <option value="其他">📦 其他</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">价格（元）</label>
+                    <div class="input-group">
+                        <span class="input-group-text">¥</span>
+                        <input type="number" name="price" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">商品描述</label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="描述商品的成色、使用情况、交易方式等..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                    <i class="bi bi-upload me-2"></i>立即发布
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('preview').classList.remove('d-none');
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}

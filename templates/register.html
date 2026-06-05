@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card p-4">
+            <h4 class="fw-bold mb-4 text-center">注册</h4>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">用户名</label>
+                    <input type="text" name="username" class="form-control" placeholder="请输入用户名" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密码</label>
+                    <input type="password" name="password" class="form-control" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">注册</button>
+            </form>
+            <p class="text-center mt-3 text-muted">
+                已有账号？<a href="/login">立即登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
