@@ -2,77 +2,94 @@
 {% block content %}
 
 <!-- 横幅 -->
-<div class="p-4 mb-4 rounded-4 text-white" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+<div class="fade-in" style="background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F59E0B 100%); border-radius: 20px; padding: 32px 36px; margin-bottom: 24px; position: relative; overflow: hidden;">
+    <div style="position:absolute;top:-20px;right:-20px;width:180px;height:180px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+    <div style="position:absolute;bottom:-30px;right:80px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%;"></div>
     <div class="row align-items-center">
         <div class="col-md-8">
-            <h2 class="fw-bold mb-1">👋 欢迎来到校拾淘</h2>
-            <p class="mb-3 opacity-75">校园闲置物品交易平台，让好物找到新主人</p>
+            <div style="display:inline-block;background:rgba(255,255,255,0.2);color:white;font-size:12px;font-weight:700;padding:3px 12px;border-radius:99px;margin-bottom:10px;">🎓 专属校园二手平台</div>
+            <h2 style="color:white;font-weight:900;font-size:28px;margin-bottom:8px;">捡到宝 · 淘好物 👋</h2>
+            <p style="color:rgba(255,255,255,0.85);margin-bottom:20px;font-size:15px;">校园闲置物品交易平台，让好物找到新主人</p>
             {% if not current_user.is_authenticated %}
-            <a href="/register" class="btn btn-light fw-bold px-4 me-2">立即注册</a>
-            <a href="/login" class="btn btn-outline-light px-4">登录</a>
+            <a href="/register" style="background:white;color:#7C3AED;font-weight:700;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:transform 0.2s;display:inline-block;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">免费注册</a>
+            <a href="/login" style="background:rgba(255,255,255,0.2);color:white;font-weight:600;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;margin-left:10px;border:2px solid rgba(255,255,255,0.4);display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">登录</a>
             {% else %}
-            <a href="/publish" class="btn btn-light fw-bold px-4">+ 发布商品</a>
+            <a href="/publish" style="background:white;color:#7C3AED;font-weight:700;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">+ 发布商品</a>
+            <a href="/want" style="background:rgba(255,255,255,0.2);color:white;font-weight:600;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;margin-left:10px;border:2px solid rgba(255,255,255,0.4);display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📢 求购大厅</a>
             {% endif %}
         </div>
         <div class="col-md-4 text-center d-none d-md-block">
-            <span style="font-size: 80px;">🛍️</span>
+            <div style="font-size:90px;animation:float 3s ease-in-out infinite;">🛍️</div>
         </div>
     </div>
 </div>
 
-<!-- 分类筛选 + 排序 -->
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <div>
-        <a href="/" class="btn btn-sm category-btn {{ 'btn-primary' if not current_category else 'btn-outline-secondary' }}">全部</a>
+<style>
+@keyframes float {
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+</style>
+
+<!-- 分类 + 排序 -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/?{% if search %}search={{ search }}&{% endif %}sort={{ sort }}" class="category-btn {{ 'active' if not current_category else 'inactive' }}">全部</a>
+        {% set cat_icons = {'教材书籍':'📚','电子产品':'💻','生活用品':'🏠','运动器材':'⚽','服装鞋帽':'👕','其他':'📦'} %}
         {% for cat in categories %}
-        <a href="/?category={{ cat }}{% if search %}&search={{ search }}{% endif %}" 
-           class="btn btn-sm category-btn {{ 'btn-primary' if current_category == cat else 'btn-outline-secondary' }}">{{ cat }}</a>
+        <a href="/?category={{ cat }}{% if search %}&search={{ search }}{% endif %}&sort={{ sort }}"
+           class="category-btn {{ 'active' if current_category == cat else 'inactive' }}">
+            {{ cat_icons.get(cat, '') }} {{ cat }}
+        </a>
         {% endfor %}
     </div>
     <div class="d-flex align-items-center gap-2">
-        <span style="font-size:13px;" class="text-muted">排序：</span>
-        <a href="/?sort=new{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
-           class="btn btn-sm {{ 'btn-primary' if sort == 'new' else 'btn-outline-secondary' }} category-btn">最新</a>
-        <a href="/?sort=price_asc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
-           class="btn btn-sm {{ 'btn-primary' if sort == 'price_asc' else 'btn-outline-secondary' }} category-btn">价格↑</a>
-        <a href="/?sort=price_desc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
-           class="btn btn-sm {{ 'btn-primary' if sort == 'price_desc' else 'btn-outline-secondary' }} category-btn">价格↓</a>
-        <a href="/?sort=views{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
-           class="btn btn-sm {{ 'btn-primary' if sort == 'views' else 'btn-outline-secondary' }} category-btn">最热</a>
-        <a href="/want" class="btn btn-sm btn-outline-warning category-btn">
-            <i class="bi bi-megaphone me-1"></i>求购大厅
-        </a>
+        <span style="font-size:12px;color:#9CA3AF;font-weight:600;">排序</span>
+        <a href="/?sort=new{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'new' else '' }}">🕐 最新</a>
+        <a href="/?sort=price_asc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'price_asc' else '' }}">💰 价格↑</a>
+        <a href="/?sort=price_desc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'price_desc' else '' }}">💎 价格↓</a>
+        <a href="/?sort=views{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'views' else '' }}">🔥 最热</a>
+        <a href="/want" class="sort-btn sort-btn-want">📢 求购大厅</a>
     </div>
 </div>
 
-<!-- 搜索结果提示 -->
 {% if search %}
-<p class="text-muted mb-3">搜索 "<strong>{{ search }}</strong>" 的结果，共 {{ products|length }} 件商品</p>
+<p style="font-size:14px;color:#6B7280;margin-bottom:16px;">搜索 "<strong style="color:#7C3AED;">{{ search }}</strong>" 共找到 <strong>{{ products|length }}</strong> 件商品</p>
 {% endif %}
 
 <!-- 商品列表 -->
 {% if products %}
-<div class="row row-cols-1 row-cols-md-4 g-4">
+<div class="row row-cols-2 row-cols-md-4 g-3">
     {% for product in products %}
-    <div class="col">
-        <a href="/product/{{ product.id }}" class="text-decoration-none text-dark">
-            <div class="card h-100">
-                {% if product.image != 'default.jpg' %}
-                <img src="/static/uploads/{{ product.image }}" class="product-img" alt="{{ product.name }}">
-                {% else %}
-                <div class="product-img d-flex align-items-center justify-content-center" style="background:#ede9fe;">
-                    <span style="font-size:50px;">📦</span>
-                </div>
+    <div class="col fade-in" style="animation-delay: {{ loop.index0 * 0.05 }}s;">
+        <a href="/product/{{ product.id }}" class="text-decoration-none">
+            <div class="product-card h-100">
+                {% if loop.index <= 3 %}
+                <div class="corner-badge">🔥 热门</div>
                 {% endif %}
-                <div class="card-body p-3">
-                    <span class="badge-category">{{ product.category }}</span>
-                    <h6 class="fw-bold mt-2 mb-1">{{ product.name }}</h6>
-                    <p class="text-muted mb-2" style="font-size:13px;">{{ product.description[:40] }}...</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-danger">¥{{ product.price }}</span>
-                        <small class="text-muted"><i class="bi bi-eye me-1"></i>{{ product.views }}</small>
+                <div class="card-img-wrap">
+                    {% if product.image != 'default.jpg' %}
+                    <img src="/static/uploads/{{ product.image }}" alt="{{ product.name }}">
+                    {% else %}
+                    <div class="card-img-placeholder">
+                        {% set placeholders = ['📚','💻','👕','⚽','🏠','📦','🎮','📱'] %}
+                        {{ placeholders[loop.index0 % 8] }}
                     </div>
-                    <small class="text-muted"><i class="bi bi-person me-1"></i>{{ product.seller.username }}</small>
+                    {% endif %}
+                </div>
+                <div class="card-body-inner">
+                    <div class="category-pill">{{ product.category }}</div>
+                    <div class="card-title">{{ product.name }}</div>
+                    <div class="card-desc">{{ product.description[:35] }}...</div>
+                    <div class="card-footer-row">
+                        <div class="price-tag"><span>¥</span>{{ product.price }}</div>
+                        <div class="card-meta">
+                            <i class="bi bi-eye"></i>{{ product.views }}
+                        </div>
+                    </div>
+                    <div class="card-meta mt-1">
+                        <i class="bi bi-person-circle"></i>{{ product.seller.username }}
+                    </div>
                 </div>
             </div>
         </a>
@@ -80,10 +97,10 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="text-center py-5">
-    <div style="font-size:60px;">🔍</div>
-    <p class="text-muted fs-5 mt-3">暂无相关商品</p>
-    <a href="/publish" class="btn btn-primary px-4">发布商品</a>
+<div class="text-center py-5 fade-in">
+    <div style="font-size:72px;animation:float 3s ease-in-out infinite;">🔍</div>
+    <p style="color:#9CA3AF;font-size:18px;margin-top:16px;">暂无相关商品</p>
+    <a href="/publish" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;padding:10px 28px;border-radius:99px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block;margin-top:8px;">发布第一个商品</a>
 </div>
 {% endif %}
 {% endblock %}

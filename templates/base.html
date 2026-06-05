@@ -7,67 +7,245 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { background-color: #f5f6fa; font-family: 'Microsoft YaHei', sans-serif; }
-        .navbar { background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 2px 15px rgba(102,126,234,0.4); }
-        .navbar-brand { font-size: 22px; font-weight: 700; color: white !important; }
-        .nav-link { color: rgba(255,255,255,0.9) !important; }
-        .nav-link:hover { color: white !important; }
-        .card { border-radius: 14px; border: none; box-shadow: 0 2px 15px rgba(0,0,0,0.07); transition: transform 0.2s, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); border: none; }
-        .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8, #6a3f96); }
-        .badge-category { background: #ede9fe; color: #7c3aed; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .search-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 25px; padding: 6px 18px; }
-        .search-box::placeholder { color: rgba(255,255,255,0.7); }
-        .search-box:focus { background: rgba(255,255,255,0.25); border-color: white; color: white; box-shadow: none; outline: none; }
-        .category-btn { border-radius: 20px; padding: 5px 16px; font-size: 13px; margin: 3px; }
-        .product-img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px 10px 0 0; }
-        .footer { background: #2d3748; color: #a0aec0; padding: 30px 0; margin-top: 60px; }
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #EDE9FE;
+            --secondary: #F59E0B;
+            --accent: #EC4899;
+            --success: #10B981;
+        }
+        * { box-sizing: border-box; }
+        body { background: #F5F3FF; font-family: 'Microsoft YaHei', sans-serif; }
+
+        /* 导航栏 */
+        .navbar {
+            background: white;
+            border-bottom: 2px solid var(--primary-light);
+            padding: 0 0;
+            box-shadow: 0 2px 20px rgba(124,58,237,0.08);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-inner { display: flex; align-items: center; gap: 16px; padding: 10px 24px; }
+        .navbar-brand {
+            font-size: 22px; font-weight: 900; color: var(--primary) !important;
+            text-decoration: none; letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .navbar-brand span { color: var(--secondary); }
+        .search-wrap { flex: 1; max-width: 480px; position: relative; }
+        .search-wrap input {
+            width: 100%; border: 2px solid var(--primary-light); border-radius: 99px;
+            padding: 8px 48px 8px 18px; font-size: 14px; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s; background: #FAFAFA;
+        }
+        .search-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.1);
+            background: white;
+        }
+        .search-wrap button {
+            position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+            background: var(--primary); border: none; color: white;
+            border-radius: 99px; padding: 4px 14px; font-size: 13px; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .search-wrap button:hover { background: #6D28D9; transform: translateY(-50%) scale(1.05); }
+        .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+        .nav-link-item {
+            display: flex; align-items: center; gap: 4px;
+            padding: 6px 12px; border-radius: 99px; font-size: 13px;
+            color: #4B5563; text-decoration: none; font-weight: 500;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            white-space: nowrap;
+        }
+        .nav-link-item:hover {
+            background: var(--primary-light); color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .nav-link-item.active { background: var(--primary); color: white; }
+        .nav-link-item i { font-size: 15px; }
+        .nav-publish {
+            background: linear-gradient(135deg, var(--primary), #EC4899);
+            color: white !important;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+        }
+        .nav-publish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124,58,237,0.4);
+            color: white !important;
+        }
+
+        /* 闪光徽章 */
+        .badge-new {
+            background: linear-gradient(135deg, #F59E0B, #EF4444);
+            color: white; font-size: 10px; padding: 1px 6px;
+            border-radius: 99px; font-weight: 700; animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; } 50% { opacity: 0.7; }
+        }
+
+        /* 商品卡片 */
+        .product-card {
+            background: white; border-radius: 16px; overflow: hidden;
+            border: 1.5px solid #EDE9FE;
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+            cursor: pointer; position: relative;
+        }
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(124,58,237,0.15);
+            border-color: var(--primary);
+        }
+        .product-card:hover .card-img-wrap img { transform: scale(1.08); }
+        .card-img-wrap { overflow: hidden; height: 180px; position: relative; background: #F5F3FF; }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+        .card-img-placeholder {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #EDE9FE, #FCE7F3);
+            font-size: 52px;
+        }
+        .card-body-inner { padding: 12px 14px 14px; }
+        .category-pill {
+            display: inline-block; background: var(--primary-light);
+            color: var(--primary); font-size: 11px; font-weight: 600;
+            padding: 2px 10px; border-radius: 99px; margin-bottom: 6px;
+        }
+        .card-title { font-size: 14px; font-weight: 700; color: #1F2937; margin-bottom: 4px; line-height: 1.4; }
+        .card-desc { font-size: 12px; color: #9CA3AF; margin-bottom: 8px; line-height: 1.4; }
+        .card-footer-row { display: flex; justify-content: space-between; align-items: center; }
+        .price-tag {
+            font-size: 18px; font-weight: 900; color: #EF4444;
+            display: flex; align-items: baseline; gap: 1px;
+        }
+        .price-tag span { font-size: 12px; font-weight: 500; }
+        .card-meta { font-size: 11px; color: #9CA3AF; display: flex; align-items: center; gap: 4px; }
+
+        /* 角标 */
+        .corner-badge {
+            position: absolute; top: 10px; left: 10px; z-index: 2;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; font-size: 10px; font-weight: 700;
+            padding: 3px 8px; border-radius: 99px;
+        }
+
+        /* 分类按钮 */
+        .category-btn {
+            border-radius: 99px; padding: 6px 16px; font-size: 13px;
+            font-weight: 600; border: 2px solid transparent;
+            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            cursor: pointer; white-space: nowrap;
+        }
+        .category-btn:hover { transform: translateY(-2px) scale(1.05); }
+        .category-btn.active {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+        }
+        .category-btn.inactive {
+            background: white; color: #6B7280;
+            border-color: #E5E7EB;
+        }
+        .category-btn.inactive:hover {
+            border-color: var(--primary); color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* 排序按钮 */
+        .sort-btn {
+            border-radius: 99px; padding: 5px 14px; font-size: 12px;
+            font-weight: 600; border: 2px solid #E5E7EB;
+            background: white; color: #6B7280; cursor: pointer;
+            transition: all 0.2s; text-decoration: none;
+        }
+        .sort-btn:hover, .sort-btn.active {
+            border-color: var(--primary); color: var(--primary);
+            background: var(--primary-light); transform: translateY(-1px);
+        }
+        .sort-btn.active {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+        .sort-btn-want {
+            border-color: var(--secondary); color: var(--secondary);
+            background: #FFFBEB;
+        }
+        .sort-btn-want:hover {
+            background: var(--secondary); color: white; border-color: var(--secondary);
+        }
+
+        /* Alert */
+        .alert { border-radius: 12px; border: none; font-size: 14px; }
+
+        /* 底部 */
+        .footer {
+            background: #1E1B4B; color: #A5B4FC;
+            padding: 32px 0; margin-top: 60px; text-align: center;
+        }
+        .footer strong { color: white; }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeInUp 0.4s ease both; }
+        .fade-in-delay-1 { animation-delay: 0.05s; }
+        .fade-in-delay-2 { animation-delay: 0.1s; }
+        .fade-in-delay-3 { animation-delay: 0.15s; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="/"><i class="bi bi-bag-heart-fill me-2"></i>校拾淘</a>
-        <form class="d-flex mx-auto" action="/" method="GET" style="width:35%">
-            <input class="form-control search-box me-2" type="search" name="search" placeholder="搜索商品..." value="{{ request.args.get('search', '') }}">
-            <button class="btn btn-light btn-sm px-3" type="submit" style="border-radius:20px;">搜索</button>
+
+<!-- 导航栏 -->
+<nav class="navbar">
+    <div class="navbar-inner container">
+        <a class="navbar-brand" href="/">
+    <div style="display:flex;align-items:center;gap:10px;">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="校拾淘" style="height:52px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(124,58,237,0.3));">
+</div>
+</a>
+        <form class="search-wrap" action="/" method="GET">
+            <input type="search" name="search" placeholder="搜教材、电子产品、生活用品..." value="{{ request.args.get('search', '') }}">
+            <button type="submit"><i class="bi bi-search"></i></button>
         </form>
-        <div class="navbar-nav ms-auto align-items-center">
-            <a class="nav-link" href="/"><i class="bi bi-house me-1"></i>首页</a>
+        <div class="nav-links">
+            <a class="nav-link-item" href="/"><i class="bi bi-house-door"></i>首页</a>
             {% if current_user.is_authenticated %}
-                <a class="nav-link" href="/publish"><i class="bi bi-plus-circle me-1"></i>发布</a>
-                <a class="nav-link" href="/my_products"><i class="bi bi-box me-1"></i>我的</a>
-                <a class="nav-link" href="/my_favorites"><i class="bi bi-heart me-1"></i>收藏</a>
-<a class="nav-link" href="/want"><i class="bi bi-megaphone me-1"></i>求购</a>
-                <a class="nav-link" href="/profile/{{ current_user.id }}"><i class="bi bi-person-circle me-1"></i>{{ current_user.username }}</a>
-                <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right me-1"></i>退出</a>
+                <a class="nav-link-item nav-publish" href="/publish"><i class="bi bi-plus-circle"></i>发布</a>
+                <a class="nav-link-item" href="/my_products"><i class="bi bi-box-seam"></i>我的</a>
+                <a class="nav-link-item" href="/my_favorites"><i class="bi bi-heart"></i>收藏</a>
+                <a class="nav-link-item" href="/want"><i class="bi bi-megaphone"></i>求购</a>
+                <a class="nav-link-item" href="/profile/{{ current_user.id }}"><i class="bi bi-person-circle"></i>{{ current_user.username }}</a>
+                <a class="nav-link-item" href="/logout"><i class="bi bi-box-arrow-right"></i></a>
             {% else %}
-                <a class="nav-link" href="/login"><i class="bi bi-person me-1"></i>登录</a>
-                <a class="nav-link" href="/register"><i class="bi bi-person-plus me-1"></i>注册</a>
+                <a class="nav-link-item nav-publish" href="/register"><i class="bi bi-person-plus"></i>注册</a>
+                <a class="nav-link-item" href="/login"><i class="bi bi-person"></i>登录</a>
             {% endif %}
         </div>
     </div>
 </nav>
-<div class="container">
+
+<div class="container py-3">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="alert alert-{{ category }} alert-dismissible fade show mt-2">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
     {% block content %}{% endblock %}
 </div>
-<footer class="footer text-center">
+
+<footer class="footer">
     <div class="container">
-        <p class="mb-1"><i class="bi bi-bag-heart-fill me-2"></i><strong style="color:white;">校拾淘</strong> — 校园二手交易平台</p>
+        <p class="mb-1" style="font-size:18px;"><i class="bi bi-bag-heart-fill me-2" style="color:#A5B4FC;"></i><strong>校拾淘</strong> — 校园二手交易平台</p>
         <p class="mb-0" style="font-size:13px;">让闲置物品找到新主人 · 让每一次交易更有温度</p>
     </div>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
