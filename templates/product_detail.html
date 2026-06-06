@@ -1,110 +1,397 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <div class="card p-4 mb-4">
-            {% if product.image != 'default.jpg' %}
-            <img src="/static/uploads/{{ product.image }}" class="img-fluid rounded-3 mb-3" style="max-height:350px; object-fit:cover; width:100%;">
-            {% endif %}
-            <div class="d-flex justify-content-between align-items-start">
-                <span class="badge-category">{{ product.category }}</span>
-                {% if product.status == '已售出' %}
-                <span class="badge bg-secondary">已售出</span>
+<style>
+.detail-wrap { max-width: 1000px; margin: 0 auto; padding: 20px 0 60px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+@media (max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
+
+/* 左侧主内容 */
+.detail-main { display: flex; flex-direction: column; gap: 20px; }
+.product-img-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid #EDE9FE;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.06);
+}
+.product-img-card img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+}
+.product-img-placeholder {
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #EDE9FE, #FCE7F3);
+    font-size: 80px;
+}
+.product-info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    border: 1.5px solid #EDE9FE;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.06);
+}
+.product-tags { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.tag-cat {
+    background: #EDE9FE; color: #7C3AED;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 99px;
+}
+.tag-status-on {
+    background: #D1FAE5; color: #059669;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 99px;
+}
+.tag-status-off {
+    background: #F3F4F6; color: #6B7280;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 99px;
+}
+.product-title {
+    font-size: 26px;
+    font-weight: 900;
+    color: #111827;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+.product-price-big {
+    font-size: 40px;
+    font-weight: 900;
+    color: #EF4444;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+.product-price-big small { font-size: 18px; font-weight: 600; }
+.product-meta-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6B7280;
+}
+.product-desc {
+    font-size: 15px;
+    color: #374151;
+    line-height: 1.8;
+    background: #FAFAFE;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #EDE9FE;
+}
+
+/* 留言区 */
+.comment-card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    border: 1.5px solid #EDE9FE;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.06);
+}
+.comment-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.comment-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    background: #FAFAFA;
+}
+.comment-form textarea:focus {
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 4px rgba(124,58,237,0.1);
+    background: white;
+}
+.comment-submit {
+    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+}
+.comment-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(124,58,237,0.4);
+}
+.comment-item {
+    display: flex;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid #F3F4F6;
+}
+.comment-item:last-child { border-bottom: none; }
+.comment-avatar {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.comment-body { flex: 1; }
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.comment-name { font-size: 14px; font-weight: 700; color: #111827; }
+.comment-time { font-size: 12px; color: #9CA3AF; }
+.comment-text { font-size: 14px; color: #374151; line-height: 1.6; }
+.no-comment {
+    text-align: center;
+    padding: 32px 0;
+    color: #9CA3AF;
+    font-size: 14px;
+}
+
+/* 右侧卖家信息 */
+.detail-side { display: flex; flex-direction: column; gap: 16px; }
+.seller-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1.5px solid #EDE9FE;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.06);
+}
+.seller-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6B7280;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.seller-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.seller-avatar {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 20px;
+}
+.seller-name { font-size: 16px; font-weight: 800; color: #111827; }
+.seller-since { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+.action-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+.btn-fav {
+    background: #FFF1F2;
+    color: #EF4444;
+    border-color: #FECDD3;
+}
+.btn-fav:hover, .btn-fav-active {
+    background: #EF4444;
+    color: white;
+    border-color: #EF4444;
+    transform: translateY(-2px);
+}
+.btn-fav-active {
+    background: #EF4444;
+    color: white;
+    border-color: #EF4444;
+}
+.btn-profile {
+    background: #EDE9FE;
+    color: #7C3AED;
+    border-color: #DDD6FE;
+}
+.btn-profile:hover {
+    background: #7C3AED;
+    color: white;
+    border-color: #7C3AED;
+    transform: translateY(-2px);
+}
+.manage-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1.5px solid #EDE9FE;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.06);
+}
+.btn-sold {
+    background: #F3F4F6;
+    color: #6B7280;
+    border-color: #E5E7EB;
+}
+.btn-sold:hover {
+    background: #6B7280;
+    color: white;
+    transform: translateY(-2px);
+}
+.btn-delete {
+    background: #FFF1F2;
+    color: #EF4444;
+    border-color: #FECDD3;
+}
+.btn-delete:hover {
+    background: #EF4444;
+    color: white;
+    transform: translateY(-2px);
+}
+</style>
+
+<div class="detail-wrap">
+    <div class="detail-grid">
+        <!-- 左侧 -->
+        <div class="detail-main">
+            <!-- 图片 -->
+            <div class="product-img-card">
+                {% if product.image != 'default.jpg' %}
+                <img src="/static/uploads/{{ product.image }}" alt="{{ product.name }}">
                 {% else %}
-                <span class="badge bg-success">在售</span>
+                <div class="product-img-placeholder">📦</div>
                 {% endif %}
             </div>
-            <h3 class="fw-bold mt-2">{{ product.name }}</h3>
-            <h3 class="text-danger fw-bold">¥{{ product.price }}</h3>
-            <hr>
-            <p class="text-muted" style="line-height:1.8;">{{ product.description }}</p>
-            <hr>
-            <div class="d-flex justify-content-between">
-                <small class="text-muted"><i class="bi bi-person me-1"></i>{{ product.seller.username }}</small>
-                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ product.created_at.strftime('%Y-%m-%d') }}</small>
-                <small class="text-muted"><i class="bi bi-eye me-1"></i>{{ product.views }} 次浏览</small>
-            </div>
-        </div>
 
-        <!-- 留言区 -->
-        <div class="card p-4">
-            <h5 class="fw-bold mb-3"><i class="bi bi-chat-dots me-2"></i>留言区（{{ messages|length }}条）</h5>
-            {% if current_user.is_authenticated %}
-            <form method="POST" class="mb-4">
-                <div class="mb-2">
-                    <textarea name="content" class="form-control" rows="2" placeholder="有问题？留言咨询卖家..." required></textarea>
+            <!-- 商品信息 -->
+            <div class="product-info-card">
+                <div class="product-tags">
+                    <span class="tag-cat">{{ product.category }}</span>
+                    {% if product.status == '在售' %}
+                    <span class="tag-status-on">✅ 在售</span>
+                    {% else %}
+                    <span class="tag-status-off">已售出</span>
+                    {% endif %}
                 </div>
-                <button type="submit" class="btn btn-primary px-4">
-                    <i class="bi bi-send me-1"></i>发送留言
-                </button>
-            </form>
-            {% else %}
-            <div class="alert alert-light">
-                <a href="/login" class="text-decoration-none fw-bold">登录</a> 后才能留言
+                <div class="product-title">{{ product.name }}</div>
+                <div class="product-price-big"><small>¥</small>{{ product.price }}</div>
+                <div class="product-meta-row">
+                    <div class="meta-item"><i class="bi bi-person-circle"></i>{{ product.seller.username }}</div>
+                    <div class="meta-item"><i class="bi bi-clock"></i>{{ product.created_at.strftime('%Y-%m-%d') }}</div>
+                    <div class="meta-item"><i class="bi bi-eye"></i>{{ product.views }} 次浏览</div>
+                </div>
+                <div class="product-desc">{{ product.description }}</div>
             </div>
-            {% endif %}
 
-            {% if messages %}
-                {% for msg in messages %}
-                <div class="d-flex gap-3 py-3 border-bottom">
-                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
-                         style="width:38px; height:38px; font-size:14px;">
-                        {{ msg.author.username[0].upper() }}
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <strong style="font-size:14px;">{{ msg.author.username }}</strong>
-                            <small class="text-muted">{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            <!-- 留言区 -->
+            <div class="comment-card">
+                <div class="comment-title">
+                    <i class="bi bi-chat-dots"></i>留言区
+                    <span style="font-size:14px;font-weight:500;color:#9CA3AF;">{{ messages|length }} 条</span>
+                </div>
+                {% if current_user.is_authenticated %}
+                <form method="POST" class="comment-form">
+                    <textarea name="content" rows="3" placeholder="有问题？留言咨询卖家，或者直接报价..." required></textarea>
+                    <button type="submit" class="comment-submit"><i class="bi bi-send me-1"></i>发送留言</button>
+                </form>
+                {% else %}
+                <div style="background:#FAFAFE;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;">
+                    <a href="/login" style="color:#7C3AED;font-weight:700;text-decoration:none;">登录</a> 后才能留言
+                </div>
+                {% endif %}
+
+                {% if messages %}
+                <div style="margin-top:20px;">
+                    {% for msg in messages %}
+                    <div class="comment-item">
+                        <div class="comment-avatar">{{ msg.author.username[0].upper() }}</div>
+                        <div class="comment-body">
+                            <div class="comment-header">
+                                <span class="comment-name">{{ msg.author.username }}</span>
+                                <span class="comment-time">{{ msg.created_at.strftime('%m-%d %H:%M') }}</span>
+                            </div>
+                            <div class="comment-text">{{ msg.content }}</div>
                         </div>
-                        <p class="mb-0" style="font-size:14px;">{{ msg.content }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-comment">💬 暂无留言，快来抢沙发！</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 右侧 -->
+        <div class="detail-side">
+            <div class="seller-card">
+                <div class="seller-title">卖家信息</div>
+                <div class="seller-info">
+                    <div class="seller-avatar">{{ product.seller.username[0].upper() }}</div>
+                    <div>
+                        <div class="seller-name">{{ product.seller.username }}</div>
+                        <div class="seller-since">加入于 {{ product.seller.created_at.strftime('%Y-%m-%d') }}</div>
                     </div>
                 </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-muted text-center py-3">暂无留言，快来抢沙发！</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- 右侧卖家信息 -->
-    <div class="col-md-4">
-        <div class="card p-4 mb-3">
-            <h6 class="fw-bold mb-3"><i class="bi bi-person-circle me-2"></i>卖家信息</h6>
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
-                     style="width:48px; height:48px; font-size:18px;">
-                    {{ product.seller.username[0].upper() }}
-                </div>
-                <div>
-                    <p class="fw-bold mb-0">{{ product.seller.username }}</p>
-                    <small class="text-muted">加入于 {{ product.seller.created_at.strftime('%Y-%m-%d') }}</small>
-                </div>
+                <a href="/profile/{{ product.seller.id }}" class="action-btn btn-profile">
+                    <i class="bi bi-shop me-1"></i>查看主页
+                </a>
+                {% if current_user.is_authenticated and current_user.id != product.user_id %}
+                <a href="/favorite/{{ product.id }}" class="action-btn {{ 'btn-fav-active' if is_favorited else 'btn-fav' }}">
+                    <i class="bi bi-heart{{ '-fill' if is_favorited else '' }} me-1"></i>
+                    {{ '已收藏 ❤️' if is_favorited else '收藏商品' }}
+                </a>
+                {% endif %}
             </div>
-            <a href="/profile/{{ product.seller.id }}" class="btn btn-outline-primary btn-sm w-100 mb-2">
-                <i class="bi bi-shop me-1"></i>查看他的主页
-            </a>
-            {% if current_user.is_authenticated and current_user.id != product.user_id %}
-            <a href="/favorite/{{ product.id }}" class="btn btn-sm w-100 {{ 'btn-danger' if is_favorited else 'btn-outline-danger' }}">
-                <i class="bi bi-heart{{ '-fill' if is_favorited else '' }} me-1"></i>
-                {{ '已收藏' if is_favorited else '收藏商品' }}
-            </a>
-            {% endif %}
-        </div>
 
-        {% if current_user.is_authenticated and current_user.id == product.user_id %}
-        <div class="card p-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-gear me-2"></i>管理商品</h6>
-            {% if product.status == '在售' %}
-            <a href="/sold/{{ product.id }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
-                <i class="bi bi-check-circle me-1"></i>标记为已售出
-            </a>
+            {% if current_user.is_authenticated and current_user.id == product.user_id %}
+            <div class="manage-card">
+                <div class="seller-title">管理商品</div>
+                {% if product.status == '在售' %}
+                <a href="/sold/{{ product.id }}" class="action-btn btn-sold">
+                    <i class="bi bi-check-circle me-1"></i>标记为已售出
+                </a>
+                {% endif %}
+                <a href="/delete_product/{{ product.id }}" class="action-btn btn-delete"
+                   onclick="return confirm('确定删除这个商品吗？')">
+                    <i class="bi bi-trash me-1"></i>删除商品
+                </a>
+            </div>
             {% endif %}
-            <a href="/delete_product/{{ product.id }}" class="btn btn-outline-danger btn-sm w-100"
-               onclick="return confirm('确定删除这个商品吗？')">
-                <i class="bi bi-trash me-1"></i>删除商品
-            </a>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

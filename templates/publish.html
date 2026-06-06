@@ -1,59 +1,281 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7">
-        <div class="card p-4">
-            <h4 class="fw-bold mb-4 text-center"><i class="bi bi-plus-circle me-2"></i>发布商品</h4>
-            <form method="POST" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">商品图片</label>
-                    <input type="file" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
-                    <div id="preview" class="mt-2 d-none">
-                        <img id="preview-img" src="" class="img-fluid rounded-3" style="max-height:200px;">
+<style>
+.publish-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 20px 0 60px;
+}
+.publish-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.publish-header h2 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #111827;
+    margin-bottom: 8px;
+}
+.publish-header p {
+    color: #9CA3AF;
+    font-size: 15px;
+}
+.publish-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.08);
+    border: 1.5px solid #EDE9FE;
+}
+.form-section {
+    margin-bottom: 28px;
+}
+.form-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #7C3AED;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.form-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #EDE9FE;
+}
+.form-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+    display: block;
+}
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #FAFAFA;
+    color: #111827;
+    font-family: inherit;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 4px rgba(124,58,237,0.1);
+    background: white;
+}
+.form-textarea { resize: vertical; min-height: 120px; }
+.price-input-wrap { position: relative; }
+.price-symbol {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 900;
+    color: #EF4444;
+    font-size: 16px;
+}
+.price-input-wrap .form-input { padding-left: 32px; }
+
+/* 图片上传区 */
+.upload-area {
+    border: 2px dashed #DDD6FE;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #FAFAFE;
+    position: relative;
+}
+.upload-area:hover {
+    border-color: #7C3AED;
+    background: #EDE9FE;
+}
+.upload-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+.upload-icon { font-size: 40px; margin-bottom: 12px; }
+.upload-text { font-size: 15px; font-weight: 600; color: #4B5563; margin-bottom: 4px; }
+.upload-hint { font-size: 12px; color: #9CA3AF; }
+.preview-img {
+    width: 100%;
+    max-height: 240px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-top: 16px;
+    display: none;
+    border: 2px solid #EDE9FE;
+}
+
+/* 分类选择 */
+.cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.cat-option { display: none; }
+.cat-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4B5563;
+    transition: all 0.2s;
+    background: #FAFAFA;
+}
+.cat-label:hover {
+    border-color: #7C3AED;
+    color: #7C3AED;
+    background: #EDE9FE;
+}
+.cat-option:checked + .cat-label {
+    border-color: #7C3AED;
+    background: #7C3AED;
+    color: white;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+}
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(124,58,237,0.4);
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+</style>
+
+<div class="publish-wrap">
+    <div class="publish-header">
+        <h2>📦 发布闲置</h2>
+        <p>把不需要的东西卖给需要的同学，让好物流动起来</p>
+    </div>
+    <div class="publish-card">
+        <form method="POST" enctype="multipart/form-data">
+
+            <!-- 商品图片 -->
+            <div class="form-section">
+                <div class="form-section-title">📷 商品图片</div>
+                <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                    <input type="file" id="imageInput" name="image" accept="image/*" onchange="previewImage(this)">
+                    <div id="uploadPlaceholder">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">点击上传商品图片</div>
+                        <div class="upload-hint">支持 JPG、PNG、GIF，最大 16MB</div>
                     </div>
-                    <small class="text-muted">支持 jpg、png、gif 格式，最大16MB</small>
+                    <img id="previewImg" class="preview-img" alt="预览">
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">商品名称</label>
-                    <input type="text" name="name" class="form-control" placeholder="例如：九成新高数教材" required>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="form-section">
+                <div class="form-section-title">📝 基本信息</div>
+                <div style="margin-bottom:16px;">
+                    <label class="form-label">商品名称</label>
+                    <input type="text" name="name" class="form-input" placeholder="例如：九成新高数教材第七版" required>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">商品分类</label>
-                    <select name="category" class="form-select" required>
-                        <option value="">请选择分类</option>
-                        <option value="教材书籍">📚 教材书籍</option>
-                        <option value="电子产品">💻 电子产品</option>
-                        <option value="生活用品">🏠 生活用品</option>
-                        <option value="运动器材">⚽ 运动器材</option>
-                        <option value="服装鞋帽">👕 服装鞋帽</option>
-                        <option value="其他">📦 其他</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">价格（元）</label>
-                    <div class="input-group">
-                        <span class="input-group-text">¥</span>
-                        <input type="number" name="price" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">价格（元）</label>
+                        <div class="price-input-wrap">
+                            <span class="price-symbol">¥</span>
+                            <input type="number" name="price" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">商品成色</label>
+                        <select name="condition" class="form-select">
+                            <option value="全新">全新未拆封</option>
+                            <option value="九成新" selected>九成新</option>
+                            <option value="八成新">八成新</option>
+                            <option value="七成新">七成新</option>
+                            <option value="其他">其他</option>
+                        </select>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="form-label fw-bold">商品描述</label>
-                    <textarea name="description" class="form-control" rows="4" placeholder="描述商品的成色、使用情况、交易方式等..." required></textarea>
+            </div>
+
+            <!-- 商品分类 -->
+            <div class="form-section">
+                <div class="form-section-title">🏷️ 商品分类</div>
+                <div class="cat-grid">
+                    <div>
+                        <input type="radio" name="category" id="cat1" value="教材书籍" class="cat-option" required>
+                        <label for="cat1" class="cat-label">📚 教材书籍</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="category" id="cat2" value="电子产品" class="cat-option">
+                        <label for="cat2" class="cat-label">💻 电子产品</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="category" id="cat3" value="生活用品" class="cat-option">
+                        <label for="cat3" class="cat-label">🏠 生活用品</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="category" id="cat4" value="运动器材" class="cat-option">
+                        <label for="cat4" class="cat-label">⚽ 运动器材</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="category" id="cat5" value="服装鞋帽" class="cat-option">
+                        <label for="cat5" class="cat-label">👕 服装鞋帽</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="category" id="cat6" value="其他" class="cat-option">
+                        <label for="cat6" class="cat-label">📦 其他</label>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
-                    <i class="bi bi-upload me-2"></i>立即发布
-                </button>
-            </form>
-        </div>
+            </div>
+
+            <!-- 商品描述 -->
+            <div class="form-section">
+                <div class="form-section-title">💬 商品描述</div>
+                <textarea name="description" class="form-textarea" placeholder="描述商品的详细情况，包括购买时间、使用情况、交易方式、联系方式等..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">🚀 立即发布</button>
+        </form>
     </div>
 </div>
+
 <script>
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('preview-img').src = e.target.result;
-            document.getElementById('preview').classList.remove('d-none');
+            const img = document.getElementById('previewImg');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            img.src = e.target.result;
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
         }
         reader.readAsDataURL(input.files[0]);
     }
