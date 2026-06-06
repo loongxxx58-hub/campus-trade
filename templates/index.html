@@ -1,93 +1,417 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- 横幅 -->
-<div class="fade-in" style="background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F59E0B 100%); border-radius: 20px; padding: 32px 36px; margin-bottom: 24px; position: relative; overflow: hidden;">
-    <div style="position:absolute;top:-20px;right:-20px;width:180px;height:180px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
-    <div style="position:absolute;bottom:-30px;right:80px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%;"></div>
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <div style="display:inline-block;background:rgba(255,255,255,0.2);color:white;font-size:12px;font-weight:700;padding:3px 12px;border-radius:99px;margin-bottom:10px;">🎓 专属校园二手平台</div>
-            <h2 style="color:white;font-weight:900;font-size:28px;margin-bottom:8px;">捡到宝 · 淘好物 👋</h2>
-            <p style="color:rgba(255,255,255,0.85);margin-bottom:20px;font-size:15px;">校园闲置物品交易平台，让好物找到新主人</p>
-            {% if not current_user.is_authenticated %}
-            <a href="/register" style="background:white;color:#7C3AED;font-weight:700;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:transform 0.2s;display:inline-block;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">免费注册</a>
-            <a href="/login" style="background:rgba(255,255,255,0.2);color:white;font-weight:600;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;margin-left:10px;border:2px solid rgba(255,255,255,0.4);display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">登录</a>
-            {% else %}
-            <a href="/publish" style="background:white;color:#7C3AED;font-weight:700;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">+ 发布商品</a>
-            <a href="/want" style="background:rgba(255,255,255,0.2);color:white;font-weight:600;padding:10px 24px;border-radius:99px;text-decoration:none;font-size:14px;margin-left:10px;border:2px solid rgba(255,255,255,0.4);display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📢 求购大厅</a>
-            {% endif %}
-        </div>
-        <div class="col-md-4 text-center d-none d-md-block">
-            <div style="font-size:90px;animation:float 3s ease-in-out infinite;">🛍️</div>
-        </div>
-    </div>
-</div>
-
 <style>
-@keyframes float {
-    0%,100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+/* Apple风格英雄区 */
+.hero-section {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 24px;
+    padding: 60px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(124,58,237,0.15) 0%, transparent 70%);
+    animation: glow 4s ease-in-out infinite alternate;
+}
+@keyframes glow {
+    0% { transform: translate(-10%, -10%) scale(1); }
+    100% { transform: translate(10%, 10%) scale(1.1); }
+}
+.hero-tag {
+    display: inline-block;
+    background: rgba(124,58,237,0.3);
+    border: 1px solid rgba(124,58,237,0.5);
+    color: #A78BFA;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 16px;
+    border-radius: 99px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+.hero-title {
+    font-size: 52px;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+}
+.hero-title span {
+    background: linear-gradient(135deg, #A78BFA, #EC4899, #F59E0B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.hero-subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 32px;
+}
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-btn-primary {
+    background: white;
+    color: #1a1a2e;
+    font-weight: 700;
+    padding: 14px 32px;
+    border-radius: 99px;
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(255,255,255,0.2);
+}
+.hero-btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(255,255,255,0.3);
+    color: #7C3AED;
+}
+.hero-btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-weight: 600;
+    padding: 14px 32px;
+    border-radius: 99px;
+    text-decoration: none;
+    font-size: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+.hero-btn-secondary:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+    color: white;
+}
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.stat-item { text-align: center; }
+.stat-num {
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    display: block;
+}
+.stat-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+}
+
+/* 分类标签栏 - 小红书风格 */
+.category-bar {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    scrollbar-width: none;
+    margin-bottom: 8px;
+}
+.category-bar::-webkit-scrollbar { display: none; }
+.cat-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    border: 2px solid transparent;
+}
+.cat-tag.active {
+    background: #7C3AED;
+    color: white;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+    transform: translateY(-2px);
+}
+.cat-tag.inactive {
+    background: white;
+    color: #4B5563;
+    border-color: #E5E7EB;
+}
+.cat-tag.inactive:hover {
+    border-color: #7C3AED;
+    color: #7C3AED;
+    background: #EDE9FE;
+    transform: translateY(-2px);
+}
+
+/* 排序栏 */
+.sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.sort-tag {
+    padding: 6px 16px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid #E5E7EB;
+    color: #6B7280;
+    background: white;
+    transition: all 0.2s;
+}
+.sort-tag:hover, .sort-tag.active {
+    border-color: #7C3AED;
+    color: #7C3AED;
+    background: #EDE9FE;
+}
+.sort-tag.active {
+    background: #7C3AED;
+    color: white;
+    border-color: #7C3AED;
+}
+
+/* 瀑布流 */
+.masonry {
+    columns: 4;
+    column-gap: 16px;
+}
+@media (max-width: 1200px) { .masonry { columns: 3; } }
+@media (max-width: 768px) { .masonry { columns: 2; } }
+.masonry-item {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.4s ease both;
+}
+.product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1.5px solid #F3F4F6;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+.product-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 20px 48px rgba(124,58,237,0.12);
+    border-color: #DDD6FE;
+}
+.product-card:hover .product-img { transform: scale(1.06); }
+.product-img-wrap {
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #EDE9FE, #FCE7F3);
+}
+.product-img {
+    width: 100%;
+    display: block;
+    transition: transform 0.4s;
+}
+.product-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%);
+}
+.product-info { padding: 12px 14px 14px; }
+.product-cat {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7C3AED;
+    background: #EDE9FE;
+    padding: 2px 8px;
+    border-radius: 99px;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+.product-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.product-desc {
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.product-price {
+    font-size: 20px;
+    font-weight: 900;
+    color: #EF4444;
+}
+.product-price small { font-size: 13px; font-weight: 500; }
+.product-seller {
+    font-size: 11px;
+    color: #9CA3AF;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.hot-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #EF4444, #F59E0B);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 99px;
+    z-index: 2;
+}
+.new-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #10B981, #3B82F6);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 99px;
+    z-index: 2;
+}
+.views-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    backdrop-filter: blur(4px);
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 80px 0;
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
-<!-- 分类 + 排序 -->
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-    <div class="d-flex flex-wrap gap-2">
-        <a href="/?{% if search %}search={{ search }}&{% endif %}sort={{ sort }}" class="category-btn {{ 'active' if not current_category else 'inactive' }}">全部</a>
-        {% set cat_icons = {'教材书籍':'📚','电子产品':'💻','生活用品':'🏠','运动器材':'⚽','服装鞋帽':'👕','其他':'📦'} %}
-        {% for cat in categories %}
-        <a href="/?category={{ cat }}{% if search %}&search={{ search }}{% endif %}&sort={{ sort }}"
-           class="category-btn {{ 'active' if current_category == cat else 'inactive' }}">
-            {{ cat_icons.get(cat, '') }} {{ cat }}
-        </a>
-        {% endfor %}
-    </div>
-    <div class="d-flex align-items-center gap-2">
-        <span style="font-size:12px;color:#9CA3AF;font-weight:600;">排序</span>
-        <a href="/?sort=new{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'new' else '' }}">🕐 最新</a>
-        <a href="/?sort=price_asc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'price_asc' else '' }}">💰 价格↑</a>
-        <a href="/?sort=price_desc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'price_desc' else '' }}">💎 价格↓</a>
-        <a href="/?sort=views{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-btn {{ 'active' if sort == 'views' else '' }}">🔥 最热</a>
-        <a href="/want" class="sort-btn sort-btn-want">📢 求购大厅</a>
+<!-- 英雄区 -->
+<div class="hero-section">
+    <div style="position:relative;z-index:1;">
+        <div class="hero-tag">🎓 专属校园二手交易平台</div>
+        <h1 class="hero-title">校园好物<br><span>捡宝淘货</span>新方式</h1>
+        <p class="hero-subtitle">让闲置物品找到新主人，让每一次交易更有温度</p>
+        <div class="hero-btns">
+            {% if not current_user.is_authenticated %}
+            <a href="/register" class="hero-btn-primary">🚀 免费加入</a>
+            <a href="/login" class="hero-btn-secondary">登录账号</a>
+            {% else %}
+            <a href="/publish" class="hero-btn-primary">📦 发布闲置</a>
+            <a href="/want" class="hero-btn-secondary">📢 求购大厅</a>
+            {% endif %}
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-num">{{ products|length }}+</span>
+                <span class="stat-label">在售商品</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">校园真实</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">0元</span>
+                <span class="stat-label">免费使用</span>
+            </div>
+        </div>
     </div>
 </div>
 
-{% if search %}
-<p style="font-size:14px;color:#6B7280;margin-bottom:16px;">搜索 "<strong style="color:#7C3AED;">{{ search }}</strong>" 共找到 <strong>{{ products|length }}</strong> 件商品</p>
-{% endif %}
+<!-- 分类栏 -->
+{% set cat_icons = {'教材书籍':'📚','电子产品':'💻','生活用品':'🏠','运动器材':'⚽','服装鞋帽':'👕','其他':'📦'} %}
+<div class="category-bar">
+    <a href="/?sort={{ sort }}" class="cat-tag {{ 'active' if not current_category else 'inactive' }}">🛍️ 全部</a>
+    {% for cat in categories %}
+    <a href="/?category={{ cat }}&sort={{ sort }}{% if search %}&search={{ search }}{% endif %}"
+       class="cat-tag {{ 'active' if current_category == cat else 'inactive' }}">
+        {{ cat_icons.get(cat,'📦') }} {{ cat }}
+    </a>
+    {% endfor %}
+</div>
 
-<!-- 商品列表 -->
+<!-- 排序栏 -->
+<div class="sort-bar">
+    <span style="font-size:13px;color:#9CA3AF;font-weight:600;">排序：</span>
+    <a href="/?sort=new{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-tag {{ 'active' if sort == 'new' else '' }}">🕐 最新发布</a>
+    <a href="/?sort=price_asc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-tag {{ 'active' if sort == 'price_asc' else '' }}">💰 价格最低</a>
+    <a href="/?sort=price_desc{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-tag {{ 'active' if sort == 'price_desc' else '' }}">💎 价格最高</a>
+    <a href="/?sort=views{% if current_category %}&category={{ current_category }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="sort-tag {{ 'active' if sort == 'views' else '' }}">🔥 最多浏览</a>
+    <a href="/want" class="sort-tag" style="border-color:#F59E0B;color:#F59E0B;background:#FFFBEB;">📢 求购大厅</a>
+    {% if search %}
+    <span style="font-size:13px;color:#6B7280;margin-left:8px;">搜索 "<strong style="color:#7C3AED;">{{ search }}</strong>" 找到 <strong>{{ products|length }}</strong> 件</span>
+    {% endif %}
+</div>
+
+<!-- 瀑布流商品 -->
 {% if products %}
-<div class="row row-cols-2 row-cols-md-4 g-3">
+<div class="masonry">
+    {% set heights = [200, 160, 220, 180, 240, 170, 210, 190] %}
     {% for product in products %}
-    <div class="col fade-in" style="animation-delay: {{ loop.index0 * 0.05 }}s;">
-        <a href="/product/{{ product.id }}" class="text-decoration-none">
-            <div class="product-card h-100">
-                {% if loop.index <= 3 %}
-                <div class="corner-badge">🔥 热门</div>
-                {% endif %}
-                <div class="card-img-wrap">
-                    {% if product.image != 'default.jpg' %}
-                    <img src="/static/uploads/{{ product.image }}" alt="{{ product.name }}">
-                    {% else %}
-                    <div class="card-img-placeholder">
-                        {% set placeholders = ['📚','💻','👕','⚽','🏠','📦','🎮','📱'] %}
-                        {{ placeholders[loop.index0 % 8] }}
-                    </div>
-                    {% endif %}
+    <div class="masonry-item" style="animation-delay: {{ loop.index0 * 0.04 }}s;">
+        <a href="/product/{{ product.id }}" class="product-card">
+            <div class="product-img-wrap">
+                {% if product.image != 'default.jpg' %}
+                <img src="/static/uploads/{{ product.image }}" class="product-img" alt="{{ product.name }}">
+                {% else %}
+                {% set ph = ['📚','💻','👕','⚽','🏠','📦','🎮','📱','🎒','✏️'] %}
+                <div class="product-placeholder" style="height: {{ heights[loop.index0 % 8] }}px; font-size: 56px;">
+                    {{ ph[loop.index0 % 10] }}
                 </div>
-                <div class="card-body-inner">
-                    <div class="category-pill">{{ product.category }}</div>
-                    <div class="card-title">{{ product.name }}</div>
-                    <div class="card-desc">{{ product.description[:35] }}...</div>
-                    <div class="card-footer-row">
-                        <div class="price-tag"><span>¥</span>{{ product.price }}</div>
-                        <div class="card-meta">
-                            <i class="bi bi-eye"></i>{{ product.views }}
-                        </div>
-                    </div>
-                    <div class="card-meta mt-1">
+                {% endif %}
+                {% if loop.index <= 3 %}
+                <div class="hot-badge">🔥 热门</div>
+                {% endif %}
+                {% if loop.index <= 6 %}
+                <div class="new-badge">NEW</div>
+                {% endif %}
+                <div class="views-badge">👁 {{ product.views }}</div>
+            </div>
+            <div class="product-info">
+                <div class="product-cat">{{ product.category }}</div>
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-desc">{{ product.description[:50] }}</div>
+                <div class="product-bottom">
+                    <div class="product-price"><small>¥</small>{{ product.price }}</div>
+                    <div class="product-seller">
                         <i class="bi bi-person-circle"></i>{{ product.seller.username }}
                     </div>
                 </div>
@@ -97,10 +421,12 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="text-center py-5 fade-in">
-    <div style="font-size:72px;animation:float 3s ease-in-out infinite;">🔍</div>
-    <p style="color:#9CA3AF;font-size:18px;margin-top:16px;">暂无相关商品</p>
-    <a href="/publish" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;padding:10px 28px;border-radius:99px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block;margin-top:8px;">发布第一个商品</a>
+<div class="empty-state">
+    <div style="font-size:80px;margin-bottom:16px;">🎒</div>
+    <p style="font-size:20px;font-weight:700;color:#374151;margin-bottom:8px;">还没有商品</p>
+    <p style="color:#9CA3AF;margin-bottom:24px;">成为第一个发布商品的同学吧！</p>
+    <a href="/publish" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;padding:12px 32px;border-radius:99px;text-decoration:none;font-weight:700;font-size:15px;">+ 发布第一件商品</a>
 </div>
 {% endif %}
+
 {% endblock %}
